@@ -1,21 +1,30 @@
 from pathlib import Path
-from typing import Callable, List, NamedTuple, Any
+import subprocess
+from typing import Callable, List, NamedTuple, Any, Union
+import sys
 
 import click
 
 
-def read_input(input_path: str) -> List[str]:
-    path = Path(input_path)
+def read_input(input_path: Path, func: Callable=None) -> List[str]:
     input_data = None
-    with open(path, 'r') as fp:
-        input_data = fp.readlines()
+    with open(input_path, 'r') as fp:
+        if func is not None:
+            input_data = list(map(func, fp.readlines()))
+        else:
+            input_data = fp.readlines()
 
     return input_data
 
 
 class TestCase(NamedTuple):
-    input_path: str
+    input_path: Union[str, Path]
     output: Any
+
+    @staticmethod
+    def setup(input_path: Union[str, Path], output: Any):
+        input_path = input_path if isinstance(input_path, Path) else Path(input_path).resolve()
+        return TestCase(input_path, output)
 
 
 def test(func: Callable, test: List[TestCase]):
@@ -26,22 +35,21 @@ def test(func: Callable, test: List[TestCase]):
     for test_case in test:
         actual_output = func(read_input(test_case.input_path))
         try:
-            assert actual_output == test_case.output, f"Test case failed\nExpected {test_case.output} but got {actual_output}"
-        except AssertionError:
+            assert actual_output == test_case.output, f"|-- Test case failed\n\t|-- Expected {test_case.output} but got {actual_output}"
+        except AssertionError as err:
             fail_counter += 1
+            print(err)
 
     print(f"Ran {len(test)} tests.")
     if fail_counter:
+        print(f"{len(test) - fail_counter} tests passed.")
         print(f"{fail_counter} tests failed.")
+    else:
+        print(f"All tests pass.")
 
 
 def run_solution(path: Path):
-    from subprocess import Popen, PIPE
-
-    process = Popen(['python', path], stdin=PIPE, stdout=PIPE)
-    stdout, _ = process.communicate()
-
-    print(stdout.decode('utf-8'))
+    subprocess.run([sys.executable, path], stdout=sys.stdout, stderr=sys.stderr)
 
 
 @click.command()
