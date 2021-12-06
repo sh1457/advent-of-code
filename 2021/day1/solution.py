@@ -1,12 +1,13 @@
 from typing import List
 from pathlib import Path
 
-from solver import TestCase, test
+from solver import TestCase, log_time, test
 
 
-def solution(input: List[int]) -> int:
+@log_time
+def solution(inputs: List[int]) -> int:
     counter = 0
-    for elem, prev in zip(input[1:], input[:-1]):
+    for elem, prev in zip(inputs[1:], inputs[:-1]):
         if elem > prev:
             counter += 1
 

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import NamedTuple, List
 
 
-from solver import TestCase, test
+from solver import TestCase, log_time, test
 
 
 class Policy(NamedTuple):
@@ -20,6 +20,7 @@ class Policy(NamedTuple):
         return Policy(minimum, maximum, character, password)
 
 
+@log_time
 def solution(policies: List[Policy]) -> int:
     valid_count = 0
     for policy in policies:
