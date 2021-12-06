@@ -27,13 +27,17 @@ class TestCase(NamedTuple):
         return TestCase(input_path, output)
 
 
-def test(func: Callable, test: List[TestCase]):
+def test(func: Callable, test: List[TestCase], line_processor: Callable=None):
     if not isinstance(test, list):
         test = [test]
 
     fail_counter = 0
     for test_case in test:
-        actual_output = func(read_input(test_case.input_path))
+        if line_processor is not None:
+            actual_output = func(read_input(test_case.input_path, line_processor))
+        else:
+            actual_output = func(read_input(test_case.input_path))
+
         try:
             assert actual_output == test_case.output, f"|-- Test case failed\n\t|-- Expected {test_case.output} but got {actual_output}"
         except AssertionError as err:
