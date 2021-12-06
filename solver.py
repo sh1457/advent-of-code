@@ -1,7 +1,9 @@
 from pathlib import Path
-import subprocess
 from typing import Callable, List, NamedTuple, Any, Union
+from functools import wraps
+import subprocess
 import sys
+import time
 
 import click
 
@@ -27,9 +29,23 @@ class TestCase(NamedTuple):
         return TestCase(input_path, output)
 
 
-def test(func: Callable, test: List[TestCase], line_processor: Callable=None):
+def log_time(func: Callable) -> Callable:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Function {func.__name__!r} executed in {end_time-start_time:.4f}s")
+        return result
+    return wrapper
+
+
+def test(func: Callable, test: List[TestCase], line_processor: Callable=None, timeit: bool=False):
     if not isinstance(test, list):
         test = [test]
+
+    if timeit:
+        func = log_time()
 
     fail_counter = 0
     for test_case in test:
