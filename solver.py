@@ -34,6 +34,16 @@ def test(func: Callable, test: List[TestCase]):
     if fail_counter:
         print(f"{fail_counter} tests failed.")
 
+
+def run_solution(path: Path):
+    from subprocess import Popen, PIPE
+
+    process = Popen(['python', path], stdin=PIPE, stdout=PIPE)
+    stdout, _ = process.communicate()
+
+    print(stdout.decode('utf-8'))
+
+
 @click.command()
 @click.option('--problem', '-p')
 def solve(problem: str):
@@ -42,4 +52,15 @@ def solve(problem: str):
 
     path = Path(__file__).parent / year / day
 
-    print(list(path.iterdir()))
+    if not path.exists():
+        raise ValueError("Problem not solved yet.")
+
+    solution_path = None
+    for _path in path.glob("*solution.py"):
+        solution_path = _path
+        break
+
+    if solution_path is None:
+        raise ValueError("Problem not solved yet.")
+
+    run_solution(solution_path)
