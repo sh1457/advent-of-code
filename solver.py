@@ -40,12 +40,9 @@ def log_time(func: Callable) -> Callable:
     return wrapper
 
 
-def test(func: Callable, test: List[TestCase], line_processor: Callable=None, timeit: bool=False):
+def test(func: Callable, test: List[TestCase], line_processor: Callable=None):
     if not isinstance(test, list):
         test = [test]
-
-    if timeit:
-        func = log_time()
 
     fail_counter = 0
     for test_case in test:
