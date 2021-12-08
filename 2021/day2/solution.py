@@ -53,12 +53,14 @@ def solution2(inputs: List[Instruction]) -> int:
 def main():
     base_path = Path(__file__).parent
     tests = [TestCase.setup(base_path / "sample.txt", 150),
-             TestCase.setup(base_path / "input.txt", 1389)]
+             TestCase.setup(base_path / "input.txt", 2120749),
+             TestCase.setup(base_path / "input2.txt", 2036120)]
 
     test(solution, tests, Instruction.from_line)
 
     tests = [TestCase.setup(base_path / "sample.txt", 900),
-             TestCase.setup(base_path / "input.txt", 2138382217)]
+             TestCase.setup(base_path / "input.txt", 2138382217),
+             TestCase.setup(base_path / "input2.txt", 2015547716)]
 
     test(solution2, tests, Instruction.from_line)
 
